@@ -1,0 +1,99 @@
+#!/usr/bin/env bash
+kube_version=v1.9.2
+kubeadm_version=v1.9.2
+etcd_version=v3.2.4
+calico_version="v2.6.2"
+calico_ctl_version="v1.6.1"
+calico_cni_version="v1.11.0"
+calico_policy_version="v1.0.0"
+calico_rr_version="v0.4.0"
+flannel_version="v0.9.1"
+flannel_cni_version="v0.3.0"
+istio_version="0.2.6"
+vault_version=0.8.1
+weave_version=2.2.0
+pod_infra_version=3.0
+contiv_version=1.1.7
+kubedns_version=1.14.8
+dnsmasqautoscaler_version=1.1.2
+kubednsautoscaler_version=1.1.2
+elasticsearch_version="v2.4.1"
+fluentd_version="1.22"
+kibana_version="v4.6.1"
+netcheck_version="v1.0"
+ALIYUN_URL=registry.cn-hangzhou.aliyuncs.com/alan123
+images=(
+  kubernetes-dashboard-amd64:v1.8.1
+  kubernetes-dashboard-init-amd64:v1.0.1
+  kube-registry-proxy:0.4
+  pause-amd64:$pod_infra_version
+  k8s-dns-kube-dns-amd64:$kubedns_version
+  k8s-dns-dnsmasq-nanny-amd64:$kubedns_version
+  k8s-dns-sidecar-amd64:$kubedns_version
+  cluster-proportional-autoscaler-amd64:$dnsmasqautoscaler_version
+  elasticsearch:$elasticsearch_version
+  fluentd-elasticsearch:$fluentd_version
+  kibana:$kibana_version
+)
+for imageName in ${images[@]} ; do
+    docker pull gcr.io/google_containers/$imageName
+    docker tag  gcr.io/google_containers/$imageName $ALIYUN_URL/$imageName
+    docker push $ALIYUN_URL/$imageName
+    docker rmi $ALIYUN_URL/$imageName
+done
+
+quay_coreos_images=(
+    etcd:$etcd_version
+    flannel:$flannel_version
+    flannel-cni:$flannel_cni_version
+    hyperkube:${kube_version}_coreos.0
+)
+for imageName in ${quay_coreos_images[@]} ; do
+    docker pull quay.io/coreos/$imageName
+    docker tag  quay.io/coreos/$imageName $ALIYUN_URL/$imageName
+    docker push $ALIYUN_URL/$imageName
+    docker rmi $ALIYUN_URL/$imageName
+done
+quay_calico_images=(
+    ctl:$calico_ctl_version
+    node:$calico_version
+    cni:$calico_cni_version
+    kube-controllers:$calico_policy_version
+    routereflector:$calico_rr_version
+)
+for imageName in ${quay_calico_images[@]} ; do
+    docker pull quay.io/calico/$imageName
+    docker tag  quay.io/calico/$imageName $ALIYUN_URL/$imageName
+    docker push $ALIYUN_URL/$imageName
+    docker rmi $ALIYUN_URL/$imageName
+done
+quay_l23network_images=(
+    k8s-netchecker-agent:$netcheck_version
+    k8s-netchecker-server:$netcheck_version
+)
+for imageName in ${quay_l23network_images[@]} ; do
+    docker pull quay.io/l23network/$imageName
+    docker tag  quay.io/l23network/$imageName $ALIYUN_URL/$imageName
+    docker push $ALIYUN_URL/$imageName
+    docker rmi $ALIYUN_URL/$imageName
+done
+quay_weaveworks_images=(
+    weave-kube:$weave_version
+    weave-npc:$weave_version
+)
+for imageName in ${quay_weaveworks_images[@]} ; do
+    docker pull weaveworks/$imageName
+    docker tag  weaveworks/$imageName $ALIYUN_URL/$imageName
+    docker push $ALIYUN_URL/$imageName
+    docker rmi $ALIYUN_URL/$imageName
+done
+quay_contiv_images=(
+    netplugin:$contiv_version
+    auth_proxy:$contiv_version
+)
+for imageName in ${quay_contiv_images[@]} ; do
+    docker pull contiv/$imageName
+    docker tag  contiv/$imageName $ALIYUN_URL/$imageName
+    docker push $ALIYUN_URL/$imageName
+    docker rmi $ALIYUN_URL/$imageName
+done
